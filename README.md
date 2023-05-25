@@ -7,5 +7,11 @@ I could add later on the possibility to write your journals using a remote conne
 
 
 #so far what I added
-[24/05/2023] Started to modify searching functions, as it is smarter to directly sort the file so the user can read it themselves if they want to.
+[24/05/2023] 
+
+Started to modify searching functions, as it is smarter to directly sort the file so the user can read it themselves if they want to.
 Trying to recursively crawl directories and proceed accordingly if the directories don't exist, will probably finish tomorrow.
+
+[25/05/2023]
+
+Finished modifying the functions to automatically store the files. I will probably add a way to use a remote connection to write your journals and save them (somewhere, on the cloud or on your local machine) anywhere but this will take some time and more knowledge I don't have so I will stop for now at this state and come back later.
