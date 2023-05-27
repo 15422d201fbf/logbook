@@ -15,3 +15,7 @@ Trying to recursively crawl directories and proceed accordingly if the directori
 [25/05/2023]
 
 Finished modifying the functions to automatically store the files. I will probably add a way to use a remote connection to write your journals and save them (somewhere, on the cloud or on your local machine) anywhere but this will take some time and more knowledge I don't have so I will stop for now at this state and come back later.
+
+[27/05/2023]
+
+Started the 'objectives' feature. Doesn't work proprely yet
