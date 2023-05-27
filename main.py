@@ -1,7 +1,7 @@
 import os, sys, math
 
 #check sudo privileges
-if not os.geteuid() == 0: sys.exit("You need to be root to perform this action.")
+if not os.geteuid() == 0: sys.exit("You need to be root to run the script.")
 
 
 #global variables
@@ -10,6 +10,9 @@ DATE = os.popen("date --iso-8601").read().strip()
 
 global PATH
 PATH = '/home/nathan/logbook/data/'
+
+global PATH_OBJ
+PATH_OBJ = '/home/nathan/logbook/objectives/'
 
 splitted_date = DATE.split("-")
 
@@ -22,17 +25,58 @@ week = math.ceil(int(day) / 7)
 global FULL_PATH
 FULL_PATH = PATH + str(year) + '/' + str(month) + '/' + str(week) + '/'
 
+global obj_year
+obj_year = str(int(year) + 1)
+
 def main():
-    #check if file already exists
+    #objectives
+    if not obj_year in os.listdir('objectives'):
+        print("\nObjectives not filed yet; create objectives ? (1/0)")
+        choice = int(input(": "))
+        
+        if choice == 1:
+            os.mkdir(PATH_OBJ + obj_year)
+            print(f"Created {obj_year} folder {PATH_OBJ}. \n")
+            with open(PATH_OBJ + obj_year + f'/OBJECTIVES{obj_year}', 'w') as f:
+                while True:
+                    try:
+                        objective = str(input("Please enter your objective (press CTRL+C or CTRL+D to stop writing): "))
+                        f.write('- ' + objective + ' []'+ '\n')
+
+                    except KeyboardInterrupt or EOFError:
+                        f.close()
+                        print("Objectives saved as {PATH_OBJ}{obj_year}/OBJECTIVES{obj_year} . ")
+                        main()
+
+        elif choice == 0:
+            pass
+
+        else:
+            print("Please input a valid number...")
+            main()
+
+    else:
+        read(f'{PATH_OBJ}{obj_year}/OBJECTIVES{obj_year}')
+
+
+    #check if file already exists in data
+
     if os.path.exists(FULL_PATH):
         if DATE in os.listdir(FULL_PATH):
-            print("Today's logbook already exists. Modify / Delete / Read (1/2/3)\n")
+            print("""Today's logbook already exists.
+            
+            1/ Modify
+            2/ Delete
+            3/ Read
+            4/ Modify objectives
+            5/ Quit\n""")
             choice = int(input(": "))
 
-            choice_dic = {1: modify, 2: delete, 3: read, 4: shutdown}
+            choice_dic = {1: modify, 2: delete, 3: read, 4: modify_obj, 5: shutdown}
             choice_dict = choice_dic.get(choice, error)
+            param = FULL_PATH + DATE
 
-            choice_dict()
+            choice_dict(param if choice != 4 else PATH_OBJ+ obj_year + f'/OBJECTIVES{obj_year}')
 
         else:
             with open(FULL_PATH + DATE, 'w') as f:
@@ -81,21 +125,47 @@ def main():
 
 
 
-
 #other functions
-def modify():
-    os.system(f"open {FULL_PATH}/{DATE}")
+def modify_obj(PATH):
+    with open(PATH, 'r') as f:
+        x = f.readlines()
+        biggest = len(max(x))
+        for j in range(len(x)):
+            formatted = x[j].strip('\n')
+            print(f'{j+1} {formatted:<{biggest}}')
 
-def delete():
-    os.system(f"rm -rf {FULL_PATH}/{DATE}")
+        while True:
+            try:
+                to_modify = int(input("(Press CTRL+C to confirm): "))
+                if not 1 <= to_modify <= len(x) + 1:
+                    print('\nPlease enter a valid number.')
+                    modify_obj(PATH)
 
-def read():
-    print(FULL_PATH + DATE + '\n')
-    os.system(f"cat {FULL_PATH}/{DATE}")
+                else:
+                    x[to_modify-1].replace('[]', '[X]')
+
+            except KeyboardInterrupt:
+                print("Saving changes...\n")
+                main()
+
+    with open(PATH, 'w+') as f:
+        f.write(x)
+        f.close()
+
+            
+def modify(PATH):
+    os.system(f"open {PATH}")
+
+def delete(PATH):
+    os.system(f"rm -rf {PATH}")
+
+def read(PATH):
+    print(PATH + '\n')
+    os.system(f"cat {PATH}")
     print("\n")
 
 
-def shutdown():
+def shutdown(dummyarg):
     sys.exit("Quitting...\n")
 
 
